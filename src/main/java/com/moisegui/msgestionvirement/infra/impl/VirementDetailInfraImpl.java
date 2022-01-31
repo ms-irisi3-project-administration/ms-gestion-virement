@@ -6,7 +6,6 @@ import com.moisegui.msgestionvirement.infra.core.AbstractInfraImpl;
 import com.moisegui.msgestionvirement.infra.dao.VirementDetailDao;
 import com.moisegui.msgestionvirement.infra.entity.VirementDetailEntity;
 import com.moisegui.msgestionvirement.infra.facade.VirementDetailInfra;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public class VirementDetailInfraImpl extends AbstractInfraImpl implements Vireme
 
     @Override
     public VirementDetail save(VirementDetail virementDetail) {
-        if(virementDetail.getId() == null){
+        if (virementDetail.getId() == null) {
             VirementDetailConverter.convertVirement = true;
             VirementDetailEntity virementDetailEntity = VirementDetailConverter.toEntity(virementDetail);
             VirementDetailConverter.convertVirement = true;
@@ -50,7 +49,7 @@ public class VirementDetailInfraImpl extends AbstractInfraImpl implements Vireme
 
     @Override
     public VirementDetail update(VirementDetail virementDetail) {
-        if (virementDetail.getId() != null){
+        if (virementDetail.getId() != null) {
             VirementDetailConverter.convertVirement = true;
             VirementDetailEntity virementDetailEntity = VirementDetailConverter.toEntity(virementDetail);
             VirementDetailConverter.convertVirement = true;
