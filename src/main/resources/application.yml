@@ -2,7 +2,7 @@ spring:
   application:
     name: gestion-virement
 server:
-  port: 8037
+  port: 8092
 eureka:
   client:
     serviceUrl:

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/virements")
+@RequestMapping("/gestion-virement/api/v1/virements")
 public class PaiementRest {
     @Autowired
     PaiementProcess paiementProcess;

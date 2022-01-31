@@ -1,11 +1,13 @@
 package com.moisegui.msgestionvirement.domain.process.virement;
 
+import com.moisegui.msgestionvirement.application.dto.MailParameter;
 import com.moisegui.msgestionvirement.domain.core.AbstractProcessImpl;
 import com.moisegui.msgestionvirement.domain.core.Result;
 import com.moisegui.msgestionvirement.domain.pojo.Virement;
 import com.moisegui.msgestionvirement.domain.pojo.VirementDetail;
 import com.moisegui.msgestionvirement.infra.facade.VirementDetailInfra;
 import com.moisegui.msgestionvirement.infra.facade.VirementInfra;
+import com.moisegui.msgestionvirement.infra.impl.MailSender;
 import com.moisegui.msgestionvirement.infra.proxy.GestionPaieService;
 
 import java.math.BigDecimal;
@@ -17,11 +19,13 @@ public class PaiementProcessImpl extends AbstractProcessImpl<PayerProcessInput> 
     private GestionPaieService gestionPaieService;
     private VirementInfra virementInfra;
     private VirementDetailInfra virementDetailInfra;
+    private MailSender mailSender;
 
-    public PaiementProcessImpl(GestionPaieService gestionPaieService, VirementInfra virementInfra, VirementDetailInfra virementDetailInfra) {
+    public PaiementProcessImpl(GestionPaieService gestionPaieService, VirementInfra virementInfra, VirementDetailInfra virementDetailInfra, MailSender mailSender) {
         this.gestionPaieService = gestionPaieService;
         this.virementInfra = virementInfra;
         this.virementDetailInfra = virementDetailInfra;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -70,6 +74,8 @@ public class PaiementProcessImpl extends AbstractProcessImpl<PayerProcessInput> 
             for(VirementDetail virementDetail : virementDetails){
                 virementDetail.setVirement(virement);
                 virementDetailInfra.save(virementDetail);
+                // send Email to the user
+                mailSender.sendKafkaMessage(new MailParameter("bestofgui@gmail.com", "Nouveau virement pour " + virementDetail.getUserMatricule(), " Vous venez de recevoir un virement de " + virementDetail.getMontant() + " MAD"));
             }
 
             result.addInfoMessage(virementInfra.getMessage("payer.success.message"));
@@ -79,15 +85,15 @@ public class PaiementProcessImpl extends AbstractProcessImpl<PayerProcessInput> 
 
     private VirementDetail getVirementDetailsForUser(String userMatricule, Result result){
         // get user current echelon
-        BigDecimal echelonMontant = gestionPaieService.findUserCurrentEchelonMontant(userMatricule);
+        BigDecimal salaireDeBase = gestionPaieService.findUserCurrentEchelonMontant(userMatricule);
 
         // get user current primes
-        BigDecimal primeMontant = gestionPaieService.findUserCurrentPrimesMontant(userMatricule);
+        BigDecimal primesMontant = gestionPaieService.findUserCurrentPrimesMontant(userMatricule);
 
-        if(echelonMontant != null){
+        if(salaireDeBase != null){
             String echelonRef = gestionPaieService.findActiveEchelonForUser(userMatricule);
             List<String> activePrimes = gestionPaieService.findActivePrimesForUser(userMatricule);
-            return new VirementDetail(userMatricule, echelonMontant, echelonRef, activePrimes);
+            return new VirementDetail(userMatricule, salaireDeBase, echelonRef, activePrimes);
         }
 
         result.addWarningMessage(virementInfra.getMessage("payer.warning.user.echelon.not.found")+ " " + userMatricule);
