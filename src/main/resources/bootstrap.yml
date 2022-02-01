@@ -8,3 +8,7 @@ spring:
       retry:
         max-attempts: 30
         max-interval: 8000
+  application:
+    name: gestion-virement
+server:
+  port: 9002

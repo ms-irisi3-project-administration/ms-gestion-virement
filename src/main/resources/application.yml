@@ -1,5 +1,1 @@
-spring:
-  application:
-    name: gestion-virement
-server:
-  port: 9002
+
